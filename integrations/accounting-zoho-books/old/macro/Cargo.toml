@@ -1,0 +1,29 @@
+[package]
+name = "bitsnap_accounting_zoho_books_codegen"
+description = "bitsnap zoho_books codegen util"
+version = "0.0.1"
+authors.workspace = true
+documentation = "https://bitsnap.io/documentation/"
+rust-version.workspace = true
+edition.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "*"
+syn = "*"
+scraper = "*"
+proc-macro2 = "*"
+thiserror = "*"
+
+[build-dependencies]
+tokio = "*"
+futures = "*"
+
+[dev-dependencies]
+goldie = "*"
+
+[lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"

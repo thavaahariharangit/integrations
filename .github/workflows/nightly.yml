@@ -1,0 +1,151 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Code quality checks
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: quality-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            quality-
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+  # Build and test matrix
+  test:
+    name: Test (${{ matrix.os }}, ${{ matrix.rust }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            runner: ubuntu-latest
+            rust: stable
+          - os: linux
+            runner: ubuntu-latest
+            rust: nightly
+          # Uncomment when ready to test on these platforms
+          # - os: macos
+          #   runner: macos-latest
+          #   rust: stable
+          # - os: windows
+          #   runner: windows-latest
+          #   rust: stable
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: test-${{ matrix.os }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            test-${{ matrix.os }}-${{ matrix.rust }}-
+            test-${{ matrix.os }}-
+
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Run tests
+        run: cargo test --verbose
+
+      - name: Run doc tests
+        run: cargo test --doc --verbose
+
+  # Create issue on failure (only for scheduled runs)
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [quality, test]
+    if: |
+      always() &&
+      github.event_name == 'schedule' &&
+      (needs.quality.result == 'failure' || needs.test.result == 'failure')
+    permissions:
+      issues: write
+    steps:
+      - name: Create failure issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if there's already an open issue for CI failures
+          existing_issues=$(gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --label "ci-failure" \
+            --json number \
+            --jq length)
+
+          if [[ $existing_issues -gt 0 ]]; then
+            echo "CI failure issue already exists, skipping creation"
+            exit 0
+          fi
+
+          # Create new issue with proper escaping
+          cat << 'EOF' | gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "CI Failure - $(date +'%Y-%m-%d')" \
+            --label "ci-failure" \
+            --body-file -
+          ## CI Failure Report
+
+          The scheduled CI run failed on $(date +'%Y-%m-%d at %H:%M UTC').
+
+          **Workflow:** ${{ github.workflow }}
+          **Run ID:** ${{ github.run_id }}
+          **Commit:** ${{ github.sha }}
+
+          ### Failed Jobs
+          - Quality Check: ${{ needs.quality.result }}
+          - Tests: ${{ needs.test.result }}
+
+          [View detailed logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          Please investigate and resolve the failing checks.
+          EOF

@@ -1,0 +1,42 @@
+[package]
+name = "bitsnap_integrations_macro"
+description = "bitsnap common integrations macro"
+version = "0.0.1"
+
+authors.workspace = true
+documentation.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+publish = false
+
+[[bin]]
+name = "integrations_codegen"
+
+[lib]
+proc-macro = true
+
+# Dependencies for the proc-macro library
+[dependencies]
+quote.workspace = true
+syn.workspace = true
+proc-macro2.workspace = true
+
+[dev-dependencies]
+goldie.workspace = true
+
+# Dependencies specifically for the binary target
+[target.'cfg(not(lib))'.dependencies]
+tokio.workspace = true
+futures.workspace = true
+scraper.workspace = true
+anyhow.workspace = true
+
+[build-dependencies]
+tokio.workspace = true
+futures.workspace = true
+scraper.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true

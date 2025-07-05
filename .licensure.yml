@@ -1,0 +1,17 @@
+licenses:
+  - files: any
+    ident: MPL-2.0
+    authors:
+      - name: Yuriy Yarosh
+        email: yuriy@yarosh.dev
+    auto_template: true
+
+comments:
+  - columns: 120
+    extension: rs
+    commenter:
+      type: block
+      start_block_char: "/*\n"
+      per_line_char: "*"
+      end_block_char: "*/"
+      trailing_lines: 0

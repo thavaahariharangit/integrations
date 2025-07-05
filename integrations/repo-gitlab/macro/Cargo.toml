@@ -1,0 +1,28 @@
+[package]
+name = "bitsnap_repo_gitlab_macro"
+description = "bitsnap gitlab repo integration macro"
+version = "0.0.1"
+authors.workspace = true
+documentation = "https://bitsnap.io/documentation/"
+rust-version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+tokio = "*"
+chrono = "*"
+serde = "*"
+serde_json = "*"
+serde_valid = "*"
+bigdecimal = "*"
+strum_macros = "*"
+strum = "*"
+
+[dev-dependencies]
+goldie = "*"
+
+[lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"

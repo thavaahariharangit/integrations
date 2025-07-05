@@ -1,0 +1,47 @@
+[package]
+name = "bitsnap_accounting_stripe"
+description = "bitsnap stripe integration"
+version = "0.0.1"
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+documentation = "https://bitsnap.io/integrations/stripe"
+rust-version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+tokio = "*"
+chrono = "*"
+serde = "*"
+serde_json = "*"
+serde_valid = "*"
+bigdecimal = "*"
+strum_macros = "*"
+strum = "*"
+
+[dev-dependencies]
+goldie = "*"
+
+[lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"
+
+[profile.dev]
+lto = false
+panic = "abort"
+debug-assertions = true
+overflow-checks = true
+opt-level = 0
+incremental = true
+
+[profile.release]
+lto = true
+panic = "abort"
+debug-assertions = false
+overflow-checks = true
+opt-level = 3
+incremental = true

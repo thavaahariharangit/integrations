@@ -1,0 +1,28 @@
+[package]
+name = "bitsnap_accounting_myob_macro"
+description = "bitsnap myob codegen macro"
+version = "0.0.1"
+authors.workspace = true
+documentation.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote.workspace = true
+syn.workspace = true
+scraper.workspace = true
+proc-macro2.workspace = true
+thiserror.workspace = true
+
+[build-dependencies]
+tokio.workspace = true
+futures.workspace = true
+
+[dev-dependencies]
+goldie.workspace = true
+
+[lints]
+workspace = true

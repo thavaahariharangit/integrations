@@ -1,0 +1,30 @@
+[package]
+name = "bitsnap_accounting_wave_macro"
+description = "bitsnap wave macro"
+version = "0.0.1"
+authors.workspace = true
+documentation = "https://bitsnap.io/documentation/wave"
+rust-version.workspace = true
+edition.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+tokio = "*"
+
+quote = "*"
+syn = "*"
+scraper = "*"
+proc-macro2 = "*"
+thiserror = "*"
+
+[build-dependencies]
+tokio = "*"
+
+[dev-dependencies]
+goldie = "*"
+
+[lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"

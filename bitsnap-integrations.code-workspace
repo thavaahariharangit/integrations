@@ -1,0 +1,251 @@
+{
+	"folders": [
+		{
+			"name": "🖥️ Root",
+			"path": "."
+		},
+		{
+			"name": "💳 Accounting / Chargebee",
+			"path": "./integrations/accounting-chargebee"
+		},
+		{
+			"name": "💳 Accounting / FreshBooks",
+			"path": "./integrations/accounting-freshbooks"
+		},
+		{
+			"name": "💳 Accounting / MyOB",
+			"path": "./integrations/accounting-myob"
+		},
+		{
+			"name": "💳 Accounting / QBO",
+			"path": "./integrations/accounting-qbo"
+		},
+		{
+			"name": "💳 Accounting / Stripe",
+			"path": "./integrations/accounting-stripe"
+		},
+		{
+			"name": "💳 Accounting / Wave",
+			"path": "./integrations/accounting-wave"
+		},
+		{
+			"name": "💳 Accounting / Xero",
+			"path": "./integrations/accounting-xero"
+		},
+		{
+			"name": "💳 Accounting / Zoho Books",
+			"path": "./integrations/accounting-zoho-books"
+		},
+		{
+			"name": "🎯 Customer / HubSpot",
+			"path": "./integrations/customer-hubspot"
+		},
+		{
+			"name": "🎯 Customer / Insightly",
+			"path": "./integrations/customer-insightly"
+		},
+		{
+			"name": "🎯 Customer / ProsperStack",
+			"path": "./integrations/customer-prosperstack"
+		},
+		{
+			"name": "🎯 Customer / SalesForce",
+			"path": "./integrations/customer-salesforce"
+		},
+		{
+			"name": "🎯 Customer / SurveyMonkey",
+			"path": "./integrations/customer-surveymonkey"
+		},
+		{
+			"name": "🎯 Customer / Zoho CRM",
+			"path": "./integrations/customer-zoho-crm"
+		},
+		{
+			"name": "💾 Data / MySQL",
+			"path": "./integrations/data-mysql"
+		},
+		{
+			"name": "💾 Data / PostgreSQL",
+			"path": "./integrations/data-postgresql"
+		},
+		{
+			"name": "🗿 HR / Bamboo",
+			"path": "./integrations/hr-bamboo"
+		},
+		{
+			"name": "🗿 HR / Deel",
+			"path": "./integrations/hr-deel"
+		},
+		{
+			"name": "🗿 HR / Sage",
+			"path": "./integrations/hr-sage"
+		},
+		{
+			"name": "🗿 HR / Workday",
+			"path": "./integrations/hr-workday"
+		},
+		{
+			"name": "📢 Marketing / Active Campaign",
+			"path": "./integrations/marketing-active-campaign"
+		},
+		{
+			"name": "📢 Marketing / CustomerIO",
+			"path": "./integrations/marketing-customerio"
+		},
+		{
+			"name": "📢 Marketing / EngageBay",
+			"path": "./integrations/marketing-engagebay"
+		},
+		{
+			"name": "📢 Marketing / FreshDesk",
+			"path": "./integrations/marketing-freshdesk"
+		},
+		{
+			"name": "📢 Marketing / FullStory",
+			"path": "./integrations/marketing-fullstory"
+		},
+		{
+			"name": "📢 Marketing / GainSight",
+			"path": "./integrations/marketing-gainsight"
+		},
+		{
+			"name": "📢 Marketing / GatherUp",
+			"path": "./integrations/marketing-gatherup"
+		},
+		{
+			"name": "🌎 Marketing / Google",
+			"path": "./integrations/marketing-google"
+		},
+		{
+			"name": "👀 Observability / Grafana",
+			"path": "./integrations/observability-grafana"
+		},
+		{
+			"name": "👀 Observability / Loki",
+			"path": "./integrations/observability-loki"
+		},
+		{
+			"name": "👀 Observability / Prometheus",
+			"path": "./integrations/observability-prometheus"
+		},
+		{
+			"name": "👀 Observability / Pyroscope",
+			"path": "./integrations/observability-pyroscope"
+		},
+		{
+			"name": "👀 Observability / Tempo",
+			"path": "./integrations/observability-tempo"
+		},
+		{
+			"name": "👨🏻‍💻 Repo / Git",
+			"path": "./integrations/repo-git"
+		},
+		{
+			"name": "👨🏻‍💻 Repo / GitHub",
+			"path": "./integrations/repo-github"
+		},
+		{
+			"name": "👨🏻‍💻 Repo / GitLab",
+			"path": "./integrations/repo-gitlab"
+		}
+	],
+	"settings": {
+		"terminal.integrated.cwd": ".",
+		"files.associations": {
+			"*.sql": "postgres"
+		},
+		"editor.formatOnSave": true,
+		"editor.formatOnPaste": true,
+		"[rust]": {
+			"editor.semanticHighlighting.enabled": false
+		},
+		"rust-analyzer.cargo.features": [],
+		"rust-analyzer.checkOnSave": false,
+		"rust-analyzer.cargo.buildScripts.overrideCommand": null,
+		"cSpell.language": "en",
+		"cSpell.words": [
+			"bazelbuild",
+			"bazelisk",
+			"bigdecimal",
+			"bitsnap",
+			"chargebee",
+			"chrono",
+			"clippy",
+			"codegen",
+			"cranelift",
+			"customerio",
+			"Deel",
+			"dependi",
+			"dustypomerleau",
+			"elete",
+			"emove",
+			"endfor",
+			"endmacro",
+			"engagebay",
+			"feelsgood",
+			"finnadie",
+			"freshbooks",
+			"freshdesk",
+			"fullstory",
+			"gainsight",
+			"gatherup",
+			"goberserk",
+			"godmode",
+			"hubspot",
+			"hurtrealbad",
+			"iconify",
+			"insightly",
+			"jscearcy",
+			"miri",
+			"myob",
+			"nextest",
+			"ossdata",
+			"pkief",
+			"polymeilex",
+			"prosperstack",
+			"pyroscope",
+			"rlib",
+			"rustc",
+			"rustflags",
+			"rustup",
+			"ryanluker",
+			"serde",
+			"shellcheck",
+			"surveymonkey",
+			"tamasfe",
+			"temurin",
+			"thiserror",
+			"timonwong",
+			"topo",
+			"unifiedjs",
+			"upport",
+			"ventional",
+			"xero",
+			"Yarosh",
+			"Yuriy",
+			"zhangyue",
+			"Zshare"
+		],
+		"workbench.iconTheme": "material-icon-theme"
+	},
+	"extensions": {
+		"recommendations": [
+			"antfu.iconify",
+			"unifiedjs.vscode-mdx",
+			"editorconfig.editorconfig",
+			"bazelbuild.vscode-bazel",
+			"rust-lang.rust-analyzer",
+			"dustypomerleau.rust-syntax",
+			"jscearcy.rust-doc-viewer",
+			"polymeilex.rust-targets",
+			"tamasfe.even-better-toml",
+			"zhangyue.rust-mod-generator",
+			"fill-labs.dependi",
+			"ryanluker.vscode-coverage-gutters",
+			"streetsidesoftware.code-spell-checker",
+			"pkief.material-icon-theme",
+			"mads-hartmann.bash-ide-vscode",
+			"timonwong.shellcheck"
+		]
+	}
+}

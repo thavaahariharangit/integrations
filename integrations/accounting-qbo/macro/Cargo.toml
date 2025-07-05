@@ -1,0 +1,28 @@
+[package]
+name = "bitsnap_accounting_qbo_macro"
+description = "bitsnap qbo codegen macro"
+version = "0.0.1"
+authors.workspace = true
+documentation = "https://bitsnap.io/documentation/"
+rust-version.workspace = true
+edition.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote.workspace = true
+syn.workspace = true
+scraper.workspace = true
+proc-macro2.workspace = true
+thiserror.workspace = true
+
+[build-dependencies]
+tokio.workspace = true
+futures.workspace = true
+
+[dev-dependencies]
+goldie.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,74 @@
+cargo-features = ["codegen-backend", "profile-rustflags"]
+
+[workspace]
+resolver = "2"
+members = [
+  "integrations/accounting-*",
+  "integrations/customer-*",
+  "integrations/data-*",
+  "integrations/hr-*",
+  "integrations/marketing-*",
+  "integrations/observability-*",
+  "integrations/repo-*",
+]
+
+[workspace.package]
+authors = ["Yuriy Yarosh <yuriy@yarosh.dev>"]
+license = "MPL-2.0"
+repository = "https://github.com/bitsnap/integrations"
+documentation = "https://bitsnap.io/integrations"
+edition = "2024"
+rust-version = "1.89.0"
+publish = false
+
+[workspace.dependencies]
+# Async
+tokio = "^1.46"
+futures = "^0.3"
+
+# Time
+chrono = "^0.4"
+
+# Data
+serde = "^1.0"
+serde_json = "^1.0"
+serde_valid = "^1.0"
+bigdecimal = "^0.4"
+strum = "^0.27"
+strum_macros = "^0.27"
+
+# Testing
+goldie = "^0.5"
+
+# Errors
+thiserror = "^2.0"
+
+# Marco
+quote = "^1.0"
+syn = "^2.0"
+scraper = "^0.23"
+proc-macro2 = "^1.0"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"
+
+[profile.dev]
+lto = false
+panic = "abort"
+debug-assertions = true
+overflow-checks = true
+opt-level = 0
+incremental = true
+codegen-backend = "cranelift"
+rustflags = ["-Zshare-generics=y", "-C", "link-arg=-fuse-ld=lld"]
+
+[profile.release]
+lto = true
+panic = "abort"
+debug-assertions = false
+overflow-checks = true
+opt-level = 3
+incremental = true
+codegen-backend = "llvm"
+rustflags = ["-Zshare-generics=y"]

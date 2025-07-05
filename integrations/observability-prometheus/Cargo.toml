@@ -1,0 +1,40 @@
+[package]
+name = "bitsnap_integration_prometheus"
+description = "Bitsnap Prometheus integration"
+version = "0.0.1"
+authors.workspace = true
+license.workspace = true
+repository = "https://github.com/bitsnap/integration-observability-prometheus"
+documentation = "https://bitsnap.io/documentation/prometheus"
+rust-version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ['rlib']
+
+[dependencies]
+anyhow = "*"
+
+[dev-dependencies]
+goldie = "*"
+
+[lints.rust]
+unsafe_code = "forbid"
+unsafe_op_in_unsafe_fn = "forbid"
+
+[profile.dev]
+lto = false
+panic = "abort"
+debug-assertions = true
+overflow-checks = true
+opt-level = 0
+incremental = true
+
+[profile.release]
+lto = true
+panic = "abort"
+debug-assertions = false
+overflow-checks = true
+opt-level = 3
+incremental = true
