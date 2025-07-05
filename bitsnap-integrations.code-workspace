@@ -211,6 +211,8 @@
 			"ryanluker",
 			"serde",
 			"shellcheck",
+			"srcs",
+			"stdc",
 			"surveymonkey",
 			"tamasfe",
 			"temurin",

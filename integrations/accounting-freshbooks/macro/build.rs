@@ -8,9 +8,9 @@ use futures::*;
 use std::fs;
 use std::path::Path;
 
-const PARALLEL_FETCHES: usize = 8;
-#[tokio::main]
-async fn main() {
+// const PARALLEL_FETCHES: usize = 8;
+// #[tokio::main]
+fn main() {
     // let client = HttpsClient::new();
     // stream::iter(vec![
     //     "https://www.freshbooks.com/api/bill_payments",

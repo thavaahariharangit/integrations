@@ -3,6 +3,8 @@ cargo-features = ["codegen-backend", "profile-rustflags"]
 [workspace]
 resolver = "2"
 members = [
+  "integrations-macro",
+  "integrations-shared",
   "integrations/accounting-*",
   "integrations/customer-*",
   "integrations/data-*",
@@ -42,6 +44,7 @@ goldie = "^0.5"
 
 # Errors
 thiserror = "^2.0"
+anyhow = "^1.0"
 
 # Marco
 quote = "^1.0"

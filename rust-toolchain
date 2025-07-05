@@ -1,5 +1,5 @@
 [toolchain]
-channel = "nightly-2025-07-05" # 1.90.0-nightly
+channel = "nightly-2025-07-02" # 1.90.0-nightly
 
 profile = "default"
 
