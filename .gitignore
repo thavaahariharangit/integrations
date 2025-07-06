@@ -18,13 +18,3 @@ target/
 debug/
 **/*.rs.bk
 *.pdb
-
-# Bazel
-bazel-bin/
-bazel-integrations/
-bazel-out/
-bazel-testlogs/
-bazel-*/
-
-# We don't expect people to use bazel actively
-MODULE.bazel.lock

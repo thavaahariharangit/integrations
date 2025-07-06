@@ -1,0 +1,4 @@
+pub enum MyNumberEnum {
+    VAR1 = 1,
+    VAR2 = 2,
+}

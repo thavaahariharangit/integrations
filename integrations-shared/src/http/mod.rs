@@ -9,5 +9,5 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-pub mod codegen;
-pub mod http;
+mod client;
+pub use client::*;

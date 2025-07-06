@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2016-2025 Yuriy Yarosh
  * All rights reserved.

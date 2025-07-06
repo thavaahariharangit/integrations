@@ -1,0 +1,19 @@
+use bigdecimal::BigDecimal;
+use std::str::FromStr;
+pub enum MyDecimalEnum {
+    VAR1,
+    VAR2,
+}
+impl MyDecimalEnum {
+    pub fn as_bigdecimal(&self) -> BigDecimal {
+        match self {
+            Self::VAR1 => BigDecimal::from_str("1.23").unwrap(),
+            Self::VAR2 => BigDecimal::from_str("4.56").unwrap(),
+        }
+    }
+}
+impl Into<BigDecimal> for MyDecimalEnum {
+    fn into(self) -> BigDecimal {
+        self.as_bigdecimal()
+    }
+}

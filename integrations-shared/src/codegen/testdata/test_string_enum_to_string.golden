@@ -1,0 +1,4 @@
+pub enum MyStringEnum {
+    VAR1 = "value1",
+    VAR2 = "value2",
+}

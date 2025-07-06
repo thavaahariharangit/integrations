@@ -20,22 +20,5 @@ bigdecimal = "*"
 strum_macros = "*"
 strum = "*"
 
-[lints.rust]
-unsafe_code = "forbid"
-unsafe_op_in_unsafe_fn = "forbid"
-
-[profile.dev]
-lto = false
-panic = "abort"
-debug-assertions = true
-overflow-checks = true
-opt-level = 0
-incremental = true
-
-[profile.release]
-lto = true
-panic = "abort"
-debug-assertions = false
-overflow-checks = true
-opt-level = 3
-incremental = true
+[lints]
+workspace = true

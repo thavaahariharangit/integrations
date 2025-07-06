@@ -159,8 +159,11 @@
 		"[rust]": {
 			"editor.semanticHighlighting.enabled": false
 		},
-		"rust-analyzer.cargo.features": [],
-		"rust-analyzer.checkOnSave": false,
+		"rust-analyzer.cargo.extraArgs": [
+			"--profile",
+			"dev"
+		],
+		"rust-analyzer.checkOnSave": true,
 		"rust-analyzer.cargo.buildScripts.overrideCommand": null,
 		"cSpell.language": "en",
 		"cSpell.words": [
@@ -199,14 +202,17 @@
 			"miri",
 			"myob",
 			"nextest",
+			"nodelay",
 			"ossdata",
 			"pkief",
 			"polymeilex",
+			"prettyplease",
 			"prosperstack",
 			"pyroscope",
 			"rlib",
 			"rustc",
 			"rustflags",
+			"rustls",
 			"rustup",
 			"ryanluker",
 			"serde",
@@ -220,8 +226,10 @@
 			"timonwong",
 			"topo",
 			"unifiedjs",
+			"unparse",
 			"upport",
 			"ventional",
+			"webpki",
 			"xero",
 			"Yarosh",
 			"Yuriy",

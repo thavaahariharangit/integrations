@@ -1,0 +1,4 @@
+pub enum MyBoolEnum {
+    VAR1 = true,
+    VAR2 = false,
+}
