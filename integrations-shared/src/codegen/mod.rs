@@ -123,8 +123,24 @@ mod tests {
         let user_struct = APIStruct::new(
             "User".to_string(),
             vec![
-                APIStructField::new("id".to_string(), FieldType::Number, None, false, false, None, None),
-                APIStructField::new("name".to_string(), FieldType::String, None, false, false, None, None),
+                APIStructField::new(
+                    "id".to_string(),
+                    FieldType::Number,
+                    None,
+                    false,
+                    false,
+                    None,
+                    None,
+                ),
+                APIStructField::new(
+                    "name".to_string(),
+                    FieldType::String,
+                    None,
+                    false,
+                    false,
+                    None,
+                    None,
+                ),
             ],
         );
 

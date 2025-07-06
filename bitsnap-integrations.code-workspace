@@ -228,7 +228,6 @@
 			"antfu.iconify",
 			"unifiedjs.vscode-mdx",
 			"editorconfig.editorconfig",
-			"bazelbuild.vscode-bazel",
 			"rust-lang.rust-analyzer",
 			"dustypomerleau.rust-syntax",
 			"jscearcy.rust-doc-viewer",

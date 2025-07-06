@@ -1,4 +1,5 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Validate)]
 pub struct MyStructWithEnumValidation {
+    #[validate(enumerate = ["A", "B"])]
     pub enum_field: MyTestEnum,
 }

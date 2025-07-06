@@ -13,6 +13,4 @@ mod codegen;
 pub use codegen::*;
 
 #[tokio::main]
-async fn main() {
-
-}
+async fn main() {}

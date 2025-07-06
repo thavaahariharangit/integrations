@@ -150,8 +150,8 @@ impl Default for HttpClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper::StatusCode;
     use http_body_util::BodyExt;
+    use hyper::StatusCode;
 
     #[tokio::test]
     #[cfg(not(feature = "disable-online-tests"))]
