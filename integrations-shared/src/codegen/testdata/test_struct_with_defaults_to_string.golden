@@ -1,8 +1,9 @@
 #[derive(Debug, PartialEq)]
-pub struct MyStruct {
+pub struct MyStructWithDefaults {
     pub field1: String,
     pub field2: i64,
     pub field3: bigdecimal::BigDecimal,
     pub field4: bool,
     pub field5: MyEnum,
+    pub field6: String,
 }

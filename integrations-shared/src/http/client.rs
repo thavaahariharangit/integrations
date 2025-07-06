@@ -44,7 +44,7 @@ impl HttpClient {
             .build();
 
         Self {
-            client: Client::builder(executor.unwrap_or_else(TokioExecutor::new)).build(https),
+            client: Client::builder(executor.unwrap_or_default()).build(https),
         }
     }
 
@@ -71,11 +71,9 @@ impl HttpClient {
         let mut builder = Request::builder().method(method).uri(&uri);
 
         // Set appropriate headers
-        if let Some(ref bytes) = body {
-            if !bytes.is_empty() {
-                builder = builder.header("Content-Length", bytes.len());
-                builder = builder.header("Content-Type", "application/octet-stream");
-            }
+        if let Some(ref bytes) = body && !bytes.is_empty() {
+            builder = builder.header("Content-Length", bytes.len());
+            builder = builder.header("Content-Type", "application/octet-stream");
         }
 
         // Add HTTP/2 preference header
@@ -92,7 +90,7 @@ impl HttpClient {
         self.client
             .request(request)
             .await
-            .context(format!("Request to {} failed", uri))
+            .context(format!("Request to {uri} failed"))
     }
 
     /// Performs a simple GET request.
@@ -149,13 +147,13 @@ impl Default for HttpClient {
 
 #[cfg(test)]
 mod tests {
-    use http_body_util::BodyExt;
-    use hyper::StatusCode;
-
     use super::*;
     #[tokio::test]
     #[cfg(not(feature = "disable-online-tests"))]
     async fn test_get_request() {
+        use http_body_util::BodyExt;
+        use hyper::StatusCode;
+
         let client = HttpClient::new();
 
         let response = client

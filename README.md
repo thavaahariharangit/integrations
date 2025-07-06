@@ -2,6 +2,10 @@
 
 OpenSource Bitsnap integrations.
 
+Bitsnap builds API integrations a little differently.
+Rather than using standard API specifications, we generate them by reading the official documentation.
+This helps us create more reliable integrations because the docs are often the most current source of truth.
+
 ## Currently planned
 
  - [ ] 💳 Accounting / [Chargebee](https://www.chargebee.com/)
@@ -32,11 +36,7 @@ OpenSource Bitsnap integrations.
  - [ ] 📢 Marketing / [GainSight](https://www.gainsight.com/)
  - [ ] 📢 Marketing / [GatherUp](https://www.gatherup.com/)
  - [ ] 🌎 Marketing / [Google](https://marketingplatform.google.com/about/)
- - [ ] 👀 Observability / [Grafana](https://grafana.com/)
- - [ ] 👀 Observability / [Loki](https://grafana.com/)
- - [ ] 👀 Observability / [Prometheus](https://prometheus.io/)
- - [ ] 👀 Observability / [Pyroscope](https://pyroscope.io/)
- - [ ] 👀 Observability / [Tempo](https://tempo.io/)
+ - [ ] 👀 Observability / [OpenTelemetry](https://opentelemetry.io/)
  - [ ] 📦 Repo / [Git](https://git-scm.com/)
  - [ ] 📦 Repo / [GitHub](https://github.com/)
  - [ ] 📦 Repo / [GitLab](https://gitlab.com/)

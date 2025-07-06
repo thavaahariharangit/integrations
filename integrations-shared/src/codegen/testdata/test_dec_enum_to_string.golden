@@ -1,5 +1,4 @@
-use bigdecimal::BigDecimal;
-use std::str::FromStr;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MyDecimalEnum {
     VAR1,
     VAR2,
@@ -12,8 +11,8 @@ impl MyDecimalEnum {
         }
     }
 }
-impl Into<BigDecimal> for MyDecimalEnum {
-    fn into(self) -> BigDecimal {
-        self.as_bigdecimal()
+impl From<MyDecimalEnum> for BigDecimal {
+    fn from(val: MyDecimalEnum) -> Self {
+        val.as_bigdecimal()
     }
 }

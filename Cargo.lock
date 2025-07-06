@@ -180,6 +180,7 @@ name = "bitsnap_accounting_chargebee_macro"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "bitsnap_integrations_shared",
  "futures",
  "goldie",
  "proc-macro2",
@@ -617,22 +618,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bitsnap_integration_grafana"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "goldie",
-]
-
-[[package]]
-name = "bitsnap_integration_loki"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "goldie",
-]
-
-[[package]]
 name = "bitsnap_integration_mysql"
 version = "0.0.1"
 dependencies = [
@@ -641,23 +626,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bitsnap_integration_opentelemetry"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "goldie",
+]
+
+[[package]]
 name = "bitsnap_integration_postgresql"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "goldie",
-]
-
-[[package]]
-name = "bitsnap_integration_prometheus"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "goldie",
-]
-
-[[package]]
-name = "bitsnap_integration_pyroscope"
 version = "0.0.1"
 dependencies = [
  "anyhow",
@@ -682,14 +659,6 @@ dependencies = [
 
 [[package]]
 name = "bitsnap_integration_repo_gitlab"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "goldie",
-]
-
-[[package]]
-name = "bitsnap_integration_tempo"
 version = "0.0.1"
 dependencies = [
  "anyhow",

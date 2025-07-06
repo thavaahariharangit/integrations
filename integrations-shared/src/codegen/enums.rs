@@ -9,6 +9,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+use std::fmt::Display;
+
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -19,12 +21,16 @@ use super::FieldType;
 #[derive(Debug, Clone, Default, PartialEq, Encode, Decode)]
 pub struct APIEnum {
     pub name: String,
-    pub variants: Vec<(String, String)>,
+    pub variants: Vec<(String, String, bool)>, /* name, value, is_default */
     pub variant_type: FieldType,
 }
 
 impl APIEnum {
-    pub fn new(name: String, variants: Vec<(String, String)>, variant_type: FieldType) -> Self {
+    pub fn new(
+        name: String,
+        variants: Vec<(String, String, bool)>,
+        variant_type: FieldType,
+    ) -> Self {
         Self {
             name,
             variants,
@@ -35,112 +41,166 @@ impl APIEnum {
     pub fn to_stream(&self) -> TokenStream {
         let name = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
 
+        let has_default = self.variants.iter().any(|(_, _, is_default)| *is_default);
+        let derives = if has_default {
+            quote! { #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)] }
+        } else {
+            quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)] }
+        };
+
         match self.variant_type {
             FieldType::Number => {
-                let variants = self.variants.iter().map(|(variant_name, variant_value)| {
-                    let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
-                    let value_tokens: TokenStream = variant_value.parse().unwrap();
-                    quote! { #ident = #value_tokens }
-                });
+                let variants =
+                    self.variants
+                        .iter()
+                        .map(|(variant_name, variant_value, is_default)| {
+                            let ident =
+                                syn::Ident::new(variant_name, proc_macro2::Span::call_site());
+                            let value_tokens: TokenStream = variant_value.parse().unwrap();
+                            let default_attr = if *is_default {
+                                quote! { #[default] }
+                            } else {
+                                quote! {}
+                            };
+                            quote! { #default_attr #ident = #value_tokens }
+                        });
 
                 quote! {
+                    #derives
                     pub enum #name {
                         #(#variants),*
                     }
                 }
             }
             FieldType::String => {
-                let variants = self.variants.iter().map(|(variant_name, variant_value)| {
+                let variants = self.variants.iter().map(|(variant_name, _, is_default)| {
                     let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
-                    let lit_str = syn::LitStr::new(variant_value, proc_macro2::Span::call_site());
-                    quote! { #ident = #lit_str }
+                    let default_attr = if *is_default {
+                        quote! { #[default] }
+                    } else {
+                        quote! {}
+                    };
+                    quote! { #default_attr #ident }
                 });
+
+                let from_variants = self
+                    .variants
+                    .iter()
+                    .map(|(variant_name, variant_value, _)| {
+                        let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
+                        quote! {
+                            #name::#ident => #variant_value.to_string(),
+                        }
+                    });
+
                 quote! {
+                    #derives
                     pub enum #name {
                         #(#variants),*
+                    }
+
+                    impl From<#name> for String {
+                        fn from(variant: #name) -> Self {
+                            match variant {
+                                #(#from_variants)*
+                            }
+                        }
                     }
                 }
             }
             FieldType::Bool => {
-                let variants = self.variants.iter().map(|(variant_name, variant_value)| {
-                    let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
-                    let lit_bool = syn::LitBool::new(
-                        variant_value.parse::<bool>().unwrap(),
-                        proc_macro2::Span::call_site(),
-                    );
-                    quote! { #ident = #lit_bool }
-                });
+                let variants =
+                    self.variants
+                        .iter()
+                        .map(|(variant_name, variant_value, is_default)| {
+                            let ident =
+                                syn::Ident::new(variant_name, proc_macro2::Span::call_site());
+                            let lit_bool = syn::LitBool::new(
+                                variant_value.parse::<bool>().unwrap(),
+                                proc_macro2::Span::call_site(),
+                            );
+                            let default_attr = if *is_default {
+                                quote! { #[default] }
+                            } else {
+                                quote! {}
+                            };
+                            quote! { #default_attr #ident = #lit_bool }
+                        });
                 quote! {
+                    #derives
                     pub enum #name {
                         #(#variants),*
                     }
                 }
             }
-            _ => {
-                let variants = self.variants.iter().map(|(variant_name, _)| {
+            FieldType::Decimal => {
+                let variants = self.variants.iter().map(|(variant_name, _, is_default)| {
                     let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
-                    quote! { #ident }
+                    let default_attr = if *is_default {
+                        quote! { #[default] }
+                    } else {
+                        quote! {}
+                    };
+                    quote! { #default_attr #ident }
                 });
 
-                let (return_type, method_name, value_mapper, uses): (
-                    TokenStream,
-                    syn::Ident,
-                    Box<dyn Fn(&String) -> TokenStream>,
-                    TokenStream,
-                ) = match self.variant_type {
-                    FieldType::Bool => (
-                        quote! { bool },
-                        syn::Ident::new("as_bool", proc_macro2::Span::call_site()),
-                        Box::new(|v: &String| v.parse::<TokenStream>().unwrap()),
-                        quote! {},
-                    ),
-                    FieldType::Decimal => (
-                        quote! { BigDecimal },
-                        syn::Ident::new("as_bigdecimal", proc_macro2::Span::call_site()),
-                        Box::new(|v: &String| {
-                            let value_with_new =
-                                format!("BigDecimal::from_str(\"{}\").unwrap()", v);
-                            value_with_new.parse().unwrap()
-                        }),
-                        quote! { use bigdecimal::BigDecimal; use std::str::FromStr; },
-                    ),
-                    _ => unreachable!(),
-                };
-
-                let match_arms = self.variants.iter().map(|(variant_name, variant_value)| {
-                    let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
-                    let value = value_mapper(variant_value);
-                    quote! { Self::#ident => #value }
-                });
+                let match_arms = self
+                    .variants
+                    .iter()
+                    .map(|(variant_name, variant_value, _)| {
+                        let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
+                        let value = format!("BigDecimal::from_str(\"{variant_value}\").unwrap()");
+                        let value_tokens: TokenStream = value.parse().unwrap();
+                        quote! { Self::#ident => #value_tokens }
+                    });
 
                 quote! {
-                    #uses
-
+                    #derives
                     pub enum #name {
                         #(#variants),*
                     }
 
                     impl #name {
-                        pub fn #method_name(&self) -> #return_type {
+                        pub fn as_bigdecimal(&self) -> BigDecimal {
                             match self {
                                 #(#match_arms),*
                             }
                         }
                     }
 
-                    impl Into<#return_type> for #name {
-                        fn into(self) -> #return_type {
-                            self.#method_name()
+                    impl From<#name> for BigDecimal {
+                        fn from(val: #name) -> Self {
+                            val.as_bigdecimal()
                         }
+                    }
+                }
+            }
+            FieldType::Custom(_) => {
+                let variants = self.variants.iter().map(|(variant_name, _, is_default)| {
+                    let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
+                    let default_attr = if *is_default {
+                        quote! { #[default] }
+                    } else {
+                        quote! {}
+                    };
+                    quote! { #default_attr #ident }
+                });
+                quote! {
+                    #derives
+                    pub enum #name {
+                        #(#variants),*
                     }
                 }
             }
         }
     }
+}
 
-    pub fn to_string(&self) -> String {
+impl Display for APIEnum {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let file: syn::File = syn::parse2(self.to_stream()).unwrap();
-        prettyplease::unparse(&file)
+        let code = prettyplease::unparse(&file);
+        write!(f, "{code}")
     }
 }
 
@@ -154,8 +214,8 @@ mod tests {
         let api_enum_number = APIEnum::new(
             "MyNumberEnum".to_string(),
             vec![
-                ("VAR1".to_string(), "1".to_string()),
-                ("VAR2".to_string(), "2".to_string()),
+                ("VAR1".to_string(), "1".to_string(), false),
+                ("VAR2".to_string(), "2".to_string(), false),
             ],
             FieldType::Number,
         );
@@ -168,8 +228,8 @@ mod tests {
         let api_enum_string = APIEnum::new(
             "MyStringEnum".to_string(),
             vec![
-                ("VAR1".to_string(), "value1".to_string()),
-                ("VAR2".to_string(), "value2".to_string()),
+                ("VAR1".to_string(), "value1".to_string(), false),
+                ("VAR2".to_string(), "value2".to_string(), false),
             ],
             FieldType::String,
         );
@@ -182,8 +242,8 @@ mod tests {
         let api_enum_bool = APIEnum::new(
             "MyBoolEnum".to_string(),
             vec![
-                ("VAR1".to_string(), "true".to_string()),
-                ("VAR2".to_string(), "false".to_string()),
+                ("VAR1".to_string(), "true".to_string(), false),
+                ("VAR2".to_string(), "false".to_string(), false),
             ],
             FieldType::Bool,
         );
@@ -196,11 +256,25 @@ mod tests {
         let api_enum_decimal = APIEnum::new(
             "MyDecimalEnum".to_string(),
             vec![
-                ("VAR1".to_string(), "1.23".to_string()),
-                ("VAR2".to_string(), "4.56".to_string()),
+                ("VAR1".to_string(), "1.23".to_string(), false),
+                ("VAR2".to_string(), "4.56".to_string(), false),
             ],
             FieldType::Decimal,
         );
         goldie::assert!(api_enum_decimal.to_string());
+    }
+
+    #[test]
+    fn test_enum_with_default_to_string() {
+        let api_enum = APIEnum::new(
+            "MyEnumWithDefault".to_string(),
+            vec![
+                ("VAR1".to_string(), "1".to_string(), false),
+                ("VAR2".to_string(), "2".to_string(), true),
+            ],
+            FieldType::Number,
+        );
+
+        goldie::assert!(api_enum.to_string());
     }
 }

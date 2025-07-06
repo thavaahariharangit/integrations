@@ -117,24 +117,8 @@
 			"path": "./integrations/marketing-google"
 		},
 		{
-			"name": "👀 Observability / Grafana",
-			"path": "./integrations/observability-grafana"
-		},
-		{
-			"name": "👀 Observability / Loki",
-			"path": "./integrations/observability-loki"
-		},
-		{
-			"name": "👀 Observability / Prometheus",
-			"path": "./integrations/observability-prometheus"
-		},
-		{
-			"name": "👀 Observability / Pyroscope",
-			"path": "./integrations/observability-pyroscope"
-		},
-		{
-			"name": "👀 Observability / Tempo",
-			"path": "./integrations/observability-tempo"
+			"name": "👀 Observability / OpenTelemetry",
+			"path": "./integrations/observability-opentelemetry"
 		},
 		{
 			"name": "👨🏻‍💻 Repo / Git",

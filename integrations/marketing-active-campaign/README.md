@@ -1,22 +1,14 @@
-### [Active Campaign]() API Client
-
-[Bitsnap](https://bitsnap.io) Operational Intelligence Platform [Active Campaign]() API client package.
-
-## Refactoring
-
-### Bitsnap CRM API Clients
-
-
-### Code generation
-
-```bash
-
-```
+### Active Campaign
 
 ### Testing
 
-### TODO
- - [ ] refactor scraping
- - [ ] benchmarks
+```bash
+cargo test -p bitsnap_marketing_active_campaign
+
+# to update goldenfiles
+GOLDIE_UPDATE=1 cargo test -p bitsnap_hr_workday
+```
 
 ## License
+
+Licensed under the [Mozilla Public License 2.0 (MPL-2.0)](../../LICENSE).

@@ -1,21 +1,14 @@
-### [Freshdesk]() API Client
-
-[Bitsnap](https://bitsnap.io) Operational Intelligence Platform [Freshdesk]() API client package.
-
-## Refactoring
-
-### Bitsnap CRM API Clients
-
-### Code generation
-
-```bash
-
-```
+## Freshdesk
 
 ### Testing
 
-### TODO
- - [ ] refactor scraping
- - [ ] benchmarks
+```bash
+cargo test -p bitsnap_marketing_freshdesk
+
+# to update goldenfiles
+GOLDIE_UPDATE=1 cargo test -p bitsnap_marketing_freshdesk
+```
 
 ## License
+
+Licensed under the [Mozilla Public License 2.0 (MPL-2.0)](../../LICENSE).

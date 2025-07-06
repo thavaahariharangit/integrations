@@ -14,10 +14,6 @@ use std::fs;
 use std::fs::create_dir_all;
 use std::path::Path;
 
-#[path = "src/bin/codegen/mod.rs"]
-mod codegen;
-use codegen::*;
-
 fn main() {}
 
 // const PARALLEL_FETCHES: usize = 8;

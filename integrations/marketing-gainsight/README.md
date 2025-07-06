@@ -1,21 +1,14 @@
-### [Gainsight]() API Client
-
-[Bitsnap](https://bitsnap.io) Operational Intelligence Platform [Gainsight]() API client package.
-
-## Refactoring
-
-### Bitsnap CRM API Clients
-
-### Code generation
-
-```bash
-
-```
+## Gainsight
 
 ### Testing
 
-### TODO
- - [ ] refactor scraping
- - [ ] benchmarks
+```bash
+cargo test -p bitsnap_marketing_gainsight
+
+# to update goldenfiles
+GOLDIE_UPDATE=1 cargo test -p bitsnap_marketing_gainsight
+```
 
 ## License
+
+Licensed under the [Mozilla Public License 2.0 (MPL-2.0)](../../LICENSE).

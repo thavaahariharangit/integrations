@@ -1,11 +1,15 @@
 [package]
 name = "bitsnap_accounting_paypal"
 description = "bitsnap paypal integration"
+documentation = "https://bitsnap.io/integrations/paypal"
 version = "0.0.1"
+
 authors.workspace = true
-documentation = "https://bitsnap.io/documentation/"
+license.workspace = true
+repository.workspace = true
 rust-version.workspace = true
 edition.workspace = true
+publish = false
 
 [lib]
 crate-type = ["rlib"]

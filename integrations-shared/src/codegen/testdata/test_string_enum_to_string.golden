@@ -1,4 +1,13 @@
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MyStringEnum {
-    VAR1 = "value1",
-    VAR2 = "value2",
+    VAR1,
+    VAR2,
+}
+impl From<MyStringEnum> for String {
+    fn from(variant: MyStringEnum) -> Self {
+        match variant {
+            MyStringEnum::VAR1 => "value1".to_string(),
+            MyStringEnum::VAR2 => "value2".to_string(),
+        }
+    }
 }

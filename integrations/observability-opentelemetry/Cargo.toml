@@ -1,0 +1,24 @@
+[package]
+name = "bitsnap_integration_opentelemetry"
+description = "Bitsnap OpenTelemetry Integration"
+documentation = "https://bitsnap.io/integrations/opentelemetry"
+version = "0.0.1"
+
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ['rlib']
+
+[dependencies]
+anyhow = "*"
+
+[dev-dependencies]
+goldie = "*"
+
+[lints]
+workspace = true

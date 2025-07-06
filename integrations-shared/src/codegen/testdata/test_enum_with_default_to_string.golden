@@ -1,0 +1,6 @@
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum MyEnumWithDefault {
+    VAR1 = 1,
+    #[default]
+    VAR2 = 2,
+}

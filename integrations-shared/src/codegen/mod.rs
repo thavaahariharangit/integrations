@@ -19,6 +19,8 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::path::Path;
 
+use anyhow::*;
+
 use bincode::{Decode, Encode};
 
 #[derive(Debug, Clone, Copy, PartialEq, Encode, Decode)]
@@ -41,9 +43,38 @@ pub struct APIEndpoint {
 
     pub mutating: bool,
 
+    pub structs: Vec<APIStruct>,
+    pub enums: Vec<APIEnum>,
+
     pub request_body: Option<APIStruct>,
     pub response_body: Option<APIStruct>,
     pub error_response_body: Option<APIStruct>,
+}
+
+impl APIEndpoint {
+    pub fn new(
+        name: String,
+        path: String,
+        method: APIMethod,
+        mutating: bool,
+        structs: Vec<APIStruct>,
+        enums: Vec<APIEnum>,
+        request_body: Option<APIStruct>,
+        response_body: Option<APIStruct>,
+        error_response_body: Option<APIStruct>,
+    ) -> Self {
+        Self {
+            name,
+            path,
+            method,
+            mutating,
+            structs,
+            enums,
+            request_body,
+            response_body,
+            error_response_body,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Encode, Decode)]
@@ -57,14 +88,14 @@ impl API {
         Self { name, endpoints }
     }
 
-    pub fn save(&self, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn save(&self, path: &Path) -> Result<()> {
         let mut file = File::create(path)?;
-        let encoded: Vec<u8> = bincode::encode_to_vec(&self, bincode::config::standard())?;
+        let encoded: Vec<u8> = bincode::encode_to_vec(self, bincode::config::standard())?;
         file.write_all(&encoded)?;
         Ok(())
     }
 
-    pub fn load(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn load(path: &Path) -> Result<Self> {
         let mut file = File::open(path)?;
         let mut encoded = Vec::new();
         file.read_to_end(&mut encoded)?;
@@ -83,14 +114,18 @@ mod tests {
         let user_struct = APIStruct::new(
             "User".to_string(),
             vec![
-                ("id".to_string(), FieldType::Number),
-                ("name".to_string(), FieldType::String),
+                APIStructField::new("id".to_string(), FieldType::Number, None),
+                APIStructField::new("name".to_string(), FieldType::String, None),
             ],
         );
 
         let error_struct = APIStruct::new(
             "Error".to_string(),
-            vec![("message".to_string(), FieldType::String)],
+            vec![APIStructField::new(
+                "message".to_string(),
+                FieldType::String,
+                None,
+            )],
         );
 
         let endpoint1 = APIEndpoint {
@@ -98,6 +133,8 @@ mod tests {
             path: "/users/{id}".to_string(),
             method: APIMethod::GET,
             mutating: false,
+            structs: vec![user_struct.clone()],
+            enums: vec![],
             request_body: None,
             response_body: Some(user_struct.clone()),
             error_response_body: Some(error_struct.clone()),
@@ -108,6 +145,8 @@ mod tests {
             path: "/users".to_string(),
             method: APIMethod::POST,
             mutating: true,
+            structs: vec![user_struct.clone()],
+            enums: vec![],
             request_body: Some(user_struct.clone()),
             response_body: Some(user_struct.clone()),
             error_response_body: Some(error_struct.clone()),

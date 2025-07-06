@@ -1,11 +1,12 @@
 [package]
 name = "bitsnap_accounting_freshbooks"
 description = "bitsnap freshbooks integration"
+documentation = "https://bitsnap.io/integrations/freshbooks"
 version = "0.0.1"
+
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
-documentation = "https://bitsnap.io/integrations/freshbooks"
 rust-version.workspace = true
 edition.workspace = true
 publish = false

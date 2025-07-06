@@ -1,11 +1,12 @@
 [package]
 name = "bitsnap_accounting_myob"
 description = "bitsnap myob integration"
+documentation = "https://bitsnap.io/integrations/myob"
 version = "0.0.1"
+
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
-documentation = "https://bitsnap.io/integrations/myob"
 rust-version.workspace = true
 edition.workspace = true
 publish = false

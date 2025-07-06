@@ -1,12 +1,12 @@
-## FullStory
+## OpenTelemetry
 
 ### Testing
 
 ```bash
-cargo test -p bitsnap_marketing_fullstory
+cargo test -p bitsnap_observability_opentelemetry
 
 # to update goldenfiles
-GOLDIE_UPDATE=1 cargo test -p bitsnap_marketing_fullstory
+GOLDIE_UPDATE=1 cargo test -p bitsnap_observability_opentelemetry
 ```
 
 ## License

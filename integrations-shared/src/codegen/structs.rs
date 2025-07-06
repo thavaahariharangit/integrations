@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /*
  * Copyright (C) 2016-2025 Yuriy Yarosh
  * All rights reserved.
@@ -38,34 +40,106 @@ impl FieldType {
 #[derive(Debug, Clone, PartialEq, Encode, Decode)]
 pub struct APIStruct {
     pub name: String,
-    pub fields: Vec<(String, FieldType)>,
+    pub fields: Vec<APIStructField>, /* field, type, default value */
+}
+
+#[derive(Debug, Clone, PartialEq, Encode, Decode)]
+pub struct APIStructField {
+    pub name: String,
+    pub field_type: FieldType,
+    pub default_value: Option<String>,
+}
+
+impl APIStructField {
+    pub fn new(name: String, field_type: FieldType, default_value: Option<String>) -> Self {
+        Self {
+            name,
+            field_type,
+            default_value,
+        }
+    }
 }
 
 impl APIStruct {
-    pub fn new(name: String, fields: Vec<(String, FieldType)>) -> Self {
+    pub fn new(name: String, fields: Vec<APIStructField>) -> Self {
         Self { name, fields }
     }
 
     pub fn to_stream(&self) -> TokenStream {
         let name = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
 
-        let fields = self.fields.iter().map(|(field_name, field_type)| {
-            let name = syn::Ident::new(field_name, proc_macro2::Span::call_site());
-            let type_string = field_type.to_rust_type_string();
+        let struct_fields = self.fields.iter().map(|field| {
+            let name = syn::Ident::new(&field.name, proc_macro2::Span::call_site());
+            let type_string = field.field_type.to_rust_type_string();
             let ty: syn::Type = syn::parse_str(&type_string).unwrap();
             quote! { pub #name: #ty }
         });
 
-        quote! {
+        let struct_definition = quote! {
+            #[derive(Debug, PartialEq)]
             pub struct #name {
-                #(#fields),*
+                #(#struct_fields),*
             }
+        };
+
+        let has_default = self
+            .fields
+            .iter()
+            .all(|field| field.default_value.is_some());
+        if !has_default {
+            return quote! {
+                #struct_definition
+            };
+        }
+
+        let default_fields = self.fields.iter().map(|field| {
+            let name = syn::Ident::new(&field.name, proc_macro2::Span::call_site());
+            let value = match &field.default_value {
+                Some(value) => match field.field_type {
+                    FieldType::String => quote! { #value.to_string() },
+                    FieldType::Number => {
+                        let val_lit: syn::LitInt = syn::parse_str(value).unwrap();
+                        quote! { #val_lit }
+                    }
+                    FieldType::Decimal => {
+                        quote! { ::std::str::FromStr::from_str(#value).unwrap() }
+                    }
+                    FieldType::Bool => {
+                        let val_lit: syn::LitBool = syn::parse_str(value).unwrap();
+                        quote! { #val_lit }
+                    }
+                    FieldType::Custom(_) => {
+                        let val_path: syn::Path = syn::parse_str(value).unwrap();
+                        quote! { #val_path }
+                    }
+                },
+                None => quote! { Default::default() },
+            };
+            quote! { #name: #value }
+        });
+
+        let default_impl = quote! {
+            impl Default for #name {
+                fn default() -> Self {
+                    Self {
+                        #(#default_fields),*
+                    }
+                }
+            }
+        };
+
+        quote! {
+            #struct_definition
+            #default_impl
         }
     }
+}
 
-    pub fn to_string(&self) -> String {
+impl Display for APIStruct {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let file: syn::File = syn::parse2(self.to_stream()).unwrap();
-        prettyplease::unparse(&file)
+        let code = prettyplease::unparse(&file);
+        write!(f, "{code}")
     }
 }
 
@@ -78,14 +152,52 @@ mod tests {
         let api_struct = APIStruct::new(
             "MyStruct".to_string(),
             vec![
-                ("field1".to_string(), FieldType::String),
-                ("field2".to_string(), FieldType::Number),
-                ("field3".to_string(), FieldType::Decimal),
-                ("field4".to_string(), FieldType::Bool),
-                (
+                APIStructField::new("field1".to_string(), FieldType::String, None),
+                APIStructField::new("field2".to_string(), FieldType::Number, None),
+                APIStructField::new("field3".to_string(), FieldType::Decimal, None),
+                APIStructField::new("field4".to_string(), FieldType::Bool, None),
+                APIStructField::new(
                     "field5".to_string(),
                     FieldType::Custom("MyEnum".to_string()),
+                    None,
                 ),
+            ],
+        );
+
+        goldie::assert!(api_struct.to_string());
+    }
+
+    #[test]
+    fn test_struct_with_defaults_to_string() {
+        let api_struct = APIStruct::new(
+            "MyStructWithDefaults".to_string(),
+            vec![
+                APIStructField::new(
+                    "field1".to_string(),
+                    FieldType::String,
+                    Some("default_string".to_string()),
+                ),
+                APIStructField::new(
+                    "field2".to_string(),
+                    FieldType::Number,
+                    Some("42".to_string()),
+                ),
+                APIStructField::new(
+                    "field3".to_string(),
+                    FieldType::Decimal,
+                    Some("123.45".to_string()),
+                ),
+                APIStructField::new(
+                    "field4".to_string(),
+                    FieldType::Bool,
+                    Some("true".to_string()),
+                ),
+                APIStructField::new(
+                    "field5".to_string(),
+                    FieldType::Custom("MyEnum".to_string()),
+                    Some("MyEnum::VariantA".to_string()),
+                ),
+                APIStructField::new("field6".to_string(), FieldType::String, None),
             ],
         );
 

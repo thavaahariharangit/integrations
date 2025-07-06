@@ -25,6 +25,7 @@ goldie.workspace = true
 
 # Dependencies specifically for the binary target
 [target.'cfg(not(lib))'.dependencies]
+bitsnap_integrations_shared.workspace = true
 tokio.workspace = true
 futures.workspace = true
 scraper.workspace = true
@@ -32,9 +33,6 @@ anyhow.workspace = true
 
 [build-dependencies]
 tokio.workspace = true
-futures.workspace = true
-scraper.workspace = true
-anyhow.workspace = true
 
 [lints]
 workspace = true
