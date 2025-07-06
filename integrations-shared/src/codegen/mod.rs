@@ -23,8 +23,9 @@ use anyhow::*;
 
 use bincode::{Decode, Encode};
 
-#[derive(Debug, Clone, Copy, PartialEq, Encode, Decode)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Encode, Decode)]
 pub enum APIMethod {
+    #[default]
     GET,
     POST,
     PUT,
@@ -35,7 +36,7 @@ pub enum APIMethod {
     TRACE,
 }
 
-#[derive(Debug, Clone, PartialEq, Encode, Decode)]
+#[derive(Debug, Clone, Default, PartialEq, Encode, Decode)]
 pub struct APIEndpoint {
     pub name: String,
     pub path: String,
@@ -74,6 +75,14 @@ impl APIEndpoint {
             response_body,
             error_response_body,
         }
+    }
+
+    pub fn struct_by_name(&self, name: &str) -> Option<&APIStruct> {
+        self.structs.iter().find(|s| s.name == name)
+    }
+
+    pub fn enum_by_name(&self, name: &str) -> Option<&APIEnum> {
+        self.enums.iter().find(|s| s.name == name)
     }
 }
 
@@ -114,8 +123,8 @@ mod tests {
         let user_struct = APIStruct::new(
             "User".to_string(),
             vec![
-                APIStructField::new("id".to_string(), FieldType::Number, None),
-                APIStructField::new("name".to_string(), FieldType::String, None),
+                APIStructField::new("id".to_string(), FieldType::Number, None, false, false, None, None),
+                APIStructField::new("name".to_string(), FieldType::String, None, false, false, None, None),
             ],
         );
 
@@ -124,6 +133,10 @@ mod tests {
             vec![APIStructField::new(
                 "message".to_string(),
                 FieldType::String,
+                None,
+                false,
+                false,
+                None,
                 None,
             )],
         );

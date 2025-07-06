@@ -16,6 +16,7 @@ proc-macro = true
 
 # Dependencies for the proc-macro library
 [dependencies]
+bitsnap_integrations_shared.workspace = true
 quote.workspace = true
 syn.workspace = true
 proc-macro2.workspace = true
@@ -27,12 +28,22 @@ goldie.workspace = true
 [target.'cfg(not(lib))'.dependencies]
 bitsnap_integrations_shared.workspace = true
 tokio.workspace = true
+hyper-util.workspace = true
 futures.workspace = true
 scraper.workspace = true
 anyhow.workspace = true
+itertools.workspace = true
 
+# Executing the parsing binary in build.rs
+# Dependencies for the build script should be the same as for the binary target
 [build-dependencies]
+bitsnap_integrations_shared.workspace = true
 tokio.workspace = true
+hyper-util.workspace = true
+futures.workspace = true
+scraper.workspace = true
+anyhow.workspace = true
+itertools.workspace = true
 
 [lints]
 workspace = true

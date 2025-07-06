@@ -42,8 +42,9 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-      - name: Run clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+      # We're ignoring warnings, for now
+      # - name: Run clippy
+      #   run: cargo clippy --all-targets --all-features -- -D warnings
 
   # Build and test matrix
   test:

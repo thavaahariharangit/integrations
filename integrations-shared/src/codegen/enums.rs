@@ -175,22 +175,9 @@ impl APIEnum {
                     }
                 }
             }
-            FieldType::Custom(_) => {
-                let variants = self.variants.iter().map(|(variant_name, _, is_default)| {
-                    let ident = syn::Ident::new(variant_name, proc_macro2::Span::call_site());
-                    let default_attr = if *is_default {
-                        quote! { #[default] }
-                    } else {
-                        quote! {}
-                    };
-                    quote! { #default_attr #ident }
-                });
-                quote! {
-                    #derives
-                    pub enum #name {
-                        #(#variants),*
-                    }
-                }
+            FieldType::Struct(_) | FieldType::Enum(_) => {
+                // Enums cannot have variants of type Struct or Enum in this model.
+                quote! {}
             }
         }
     }

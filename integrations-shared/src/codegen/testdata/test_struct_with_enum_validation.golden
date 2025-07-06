@@ -1,0 +1,4 @@
+#[derive(Debug, PartialEq)]
+pub struct MyStructWithEnumValidation {
+    pub enum_field: MyTestEnum,
+}

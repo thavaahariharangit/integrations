@@ -41,6 +41,15 @@ This helps us create more reliable integrations because the docs are often the m
  - [ ] 📦 Repo / [GitHub](https://github.com/)
  - [ ] 📦 Repo / [GitLab](https://gitlab.com/)
 
+### Macro
+
+To work around the limitations of procedural macros (e.g., inability to run async code), we've separated the codegen logic into a binary target. 
+This allows the `build.rs` script to handle document parsing and save API descriptions as `bincode`-encoded files for the macro to consume.
+
+## Feel free to request any integrations!
+
+If you need any integrations, feel free just to mail me directly at [yuriy@yarosh.dev](mailto:yuriy@yarosh.dev).
+
 ## License
 
 All integrations are forever and ever licensed under the terms of [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/) license.

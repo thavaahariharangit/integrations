@@ -1,0 +1,13 @@
+#[derive(Debug, PartialEq, Validate)]
+pub struct MyStructWithValidation {
+    #[validate(min_length = 1i64, max_length = 10i64)]
+    pub string_with_len: String,
+    #[validate(min = 0i64, max = 100i64)]
+    pub number_with_range: i64,
+    #[validate(min = 0i64, max = 100i64)]
+    pub decimal_with_range: bigdecimal::BigDecimal,
+    #[validate(min_items = 1i64, max_items = 5i64)]
+    pub array_with_size: Vec<String>,
+    #[validate(min_items = 1i64, max_items = 10i64)]
+    pub map_with_size: std::collections::HashMap<String, i64>,
+}

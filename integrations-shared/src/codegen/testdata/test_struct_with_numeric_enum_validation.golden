@@ -1,0 +1,4 @@
+#[derive(Debug, PartialEq)]
+pub struct MyStructWithNumericEnumValidation {
+    pub enum_field: MyNumericEnum,
+}

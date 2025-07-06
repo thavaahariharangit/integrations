@@ -22,7 +22,8 @@ pub enum FieldType {
     Number,
     Decimal,
     Bool,
-    Custom(String),
+    Struct(String),
+    Enum(String),
 }
 
 impl FieldType {
@@ -32,7 +33,8 @@ impl FieldType {
             FieldType::Number => "i64".to_string(),
             FieldType::Decimal => "bigdecimal::BigDecimal".to_string(),
             FieldType::Bool => "bool".to_string(),
-            FieldType::Custom(name) => name.clone(),
+            FieldType::Struct(name) => name.clone(),
+            FieldType::Enum(name) => name.clone(),
         }
     }
 }
@@ -40,7 +42,7 @@ impl FieldType {
 #[derive(Debug, Clone, PartialEq, Encode, Decode)]
 pub struct APIStruct {
     pub name: String,
-    pub fields: Vec<APIStructField>, /* field, type, default value */
+    pub fields: Vec<APIStructField>,
 }
 
 #[derive(Debug, Clone, PartialEq, Encode, Decode)]
@@ -48,14 +50,24 @@ pub struct APIStructField {
     pub name: String,
     pub field_type: FieldType,
     pub default_value: Option<String>,
+
+    pub is_array: bool,
+    pub is_string_map: bool,
+
+    pub min: Option<i64>,
+    pub max: Option<i64>,
 }
 
 impl APIStructField {
-    pub fn new(name: String, field_type: FieldType, default_value: Option<String>) -> Self {
+    pub fn new(name: String, field_type: FieldType, default_value: Option<String>, is_array: bool, is_string_map: bool, min: Option<i64>, max: Option<i64>) -> Self {
         Self {
             name,
             field_type,
             default_value,
+            is_array,
+            is_string_map,
+            min,
+            max,
         }
     }
 }
@@ -65,28 +77,119 @@ impl APIStruct {
         Self { name, fields }
     }
 
-    pub fn to_stream(&self) -> TokenStream {
+    pub fn to_stream(&self, api_endpoint: Option<&super::APIEndpoint>) -> TokenStream {
         let name = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
 
         let struct_fields = self.fields.iter().map(|field| {
             let name = syn::Ident::new(&field.name, proc_macro2::Span::call_site());
-            let type_string = field.field_type.to_rust_type_string();
+            let mut type_string = field.field_type.to_rust_type_string();
+            if field.is_array {
+                type_string = format!("Vec<{}>", type_string);
+            } else if field.is_string_map {
+                type_string = format!("std::collections::HashMap<String, {}>", type_string);
+            }
             let ty: syn::Type = syn::parse_str(&type_string).unwrap();
-            quote! { pub #name: #ty }
+
+            let mut attributes: Vec<TokenStream> = Vec::new();
+
+            if field.is_array || field.is_string_map {
+                if let Some(min) = field.min {
+                    attributes.push(quote! { min_items = #min });
+                }
+                if let Some(max) = field.max {
+                    attributes.push(quote! { max_items = #max });
+                }
+            } else if field.field_type == FieldType::String {
+                if let Some(min) = field.min {
+                    attributes.push(quote! { min_length = #min });
+                }
+                if let Some(max) = field.max {
+                    attributes.push(quote! { max_length = #max });
+                }
+            } else if field.field_type == FieldType::Number || field.field_type == FieldType::Decimal {
+                if let Some(min) = field.min {
+                    attributes.push(quote! { min = #min });
+                }
+                if let Some(max) = field.max {
+                    attributes.push(quote! { max = #max });
+                }
+            }
+
+            if let FieldType::Enum(enum_name) = &field.field_type {
+                if let Some(api_endpoint) = api_endpoint {
+                    if let Some(e) = api_endpoint.enum_by_name(enum_name) {
+                        let valid_variants: Vec<_> = e
+                            .variants
+                            .iter()
+                            .filter_map(|(_, variant_value, _)| match e.variant_type {
+                                FieldType::String => Some(quote! { #variant_value }),
+                                FieldType::Number => {
+                                    let val: syn::LitInt = syn::parse_str(variant_value).unwrap();
+                                    Some(quote! { #val })
+                                }
+                                FieldType::Decimal => {
+                                    let val: syn::LitFloat = syn::parse_str(variant_value).unwrap();
+                                    Some(quote! { #val })
+                                }
+                                _ => None,
+                            })
+                            .collect();
+
+                        if !valid_variants.is_empty() {
+                            attributes.push(quote! { enumerate = [#(#valid_variants),*] });
+                        }
+                    }
+                }
+            }
+
+            let validation_attr = if !attributes.is_empty() {
+                quote! { #[validate(#(#attributes),*)] }
+            } else {
+                quote! {}
+            };
+
+            quote! {
+                #validation_attr
+                pub #name: #ty
+            }
         });
 
-        let struct_definition = quote! {
-            #[derive(Debug, PartialEq)]
-            pub struct #name {
-                #(#struct_fields),*
+        let has_validate = self.fields.iter().any(|field| {
+            if field.min.is_some() || field.max.is_some() {
+                return true;
+            }
+            if let FieldType::Enum(enum_name) = &field.field_type {
+                if let Some(endpoint) = api_endpoint {
+                    if let Some(e) = endpoint.enum_by_name(enum_name) {
+                        return !e.variants.is_empty() && matches!(e.variant_type, FieldType::String | FieldType::Number | FieldType::Decimal);
+                    }
+                }
+            }
+            false
+        });
+
+        let struct_definition = if has_validate {
+            quote! {
+                #[derive(Debug, PartialEq, Validate)]
+                pub struct #name {
+                    #(#struct_fields),*
+                }
+            }
+        } else {
+            quote! {
+                #[derive(Debug, PartialEq)]
+                pub struct #name {
+                    #(#struct_fields),*
+                }
             }
         };
 
-        let has_default = self
+        let has_full_default = self
             .fields
             .iter()
             .all(|field| field.default_value.is_some());
-        if !has_default {
+
+        if !has_full_default {
             return quote! {
                 #struct_definition
             };
@@ -94,31 +197,31 @@ impl APIStruct {
 
         let default_fields = self.fields.iter().map(|field| {
             let name = syn::Ident::new(&field.name, proc_macro2::Span::call_site());
-            let value = match &field.default_value {
-                Some(value) => match field.field_type {
-                    FieldType::String => quote! { #value.to_string() },
-                    FieldType::Number => {
-                        let val_lit: syn::LitInt = syn::parse_str(value).unwrap();
-                        quote! { #val_lit }
-                    }
-                    FieldType::Decimal => {
-                        quote! { ::std::str::FromStr::from_str(#value).unwrap() }
-                    }
-                    FieldType::Bool => {
-                        let val_lit: syn::LitBool = syn::parse_str(value).unwrap();
-                        quote! { #val_lit }
-                    }
-                    FieldType::Custom(_) => {
-                        let val_path: syn::Path = syn::parse_str(value).unwrap();
-                        quote! { #val_path }
-                    }
-                },
-                None => quote! { Default::default() },
+            let value = field.default_value.as_ref().unwrap();
+            let value_stream = match &field.field_type {
+                FieldType::String => quote! { #value.to_string() },
+                FieldType::Number => {
+                    let val_lit: syn::LitInt = syn::parse_str(value).unwrap();
+                    quote! { #val_lit }
+                }
+                FieldType::Decimal => {
+                    quote! { ::std::str::FromStr::from_str(#value).unwrap() }
+                }
+                FieldType::Bool => {
+                    let val_lit: syn::LitBool = syn::parse_str(value).unwrap();
+                    quote! { #val_lit }
+                }
+                FieldType::Struct(_) | FieldType::Enum(_) => {
+                    let val_path: syn::Path = syn::parse_str(value).unwrap();
+                    quote! { #val_path }
+                }
             };
-            quote! { #name: #value }
+            quote! { #name: #value_stream }
         });
 
-        let default_impl = quote! {
+        quote! {
+            #struct_definition
+
             impl Default for #name {
                 fn default() -> Self {
                     Self {
@@ -126,18 +229,14 @@ impl APIStruct {
                     }
                 }
             }
-        };
-
-        quote! {
-            #struct_definition
-            #default_impl
         }
     }
 }
 
 impl Display for APIStruct {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let file: syn::File = syn::parse2(self.to_stream()).unwrap();
+        let stream = self.to_stream(None);
+        let file: syn::File = syn::parse2(stream).unwrap();
         let code = prettyplease::unparse(&file);
         write!(f, "{code}")
     }
@@ -147,60 +246,213 @@ impl Display for APIStruct {
 mod tests {
     use super::*;
 
+    fn create_field(
+        name: &str,
+        field_type: FieldType,
+        default_value: Option<&str>,
+        is_array: bool,
+        is_string_map: bool,
+        min: Option<i64>,
+        max: Option<i64>,
+    ) -> APIStructField {
+        APIStructField::new(
+            name.to_string(),
+            field_type,
+            default_value.map(String::from),
+            is_array,
+            is_string_map,
+            min,
+            max,
+        )
+    }
+
     #[test]
-    fn test_struct_to_string() {
+    fn test_basic_struct() {
         let api_struct = APIStruct::new(
             "MyStruct".to_string(),
             vec![
-                APIStructField::new("field1".to_string(), FieldType::String, None),
-                APIStructField::new("field2".to_string(), FieldType::Number, None),
-                APIStructField::new("field3".to_string(), FieldType::Decimal, None),
-                APIStructField::new("field4".to_string(), FieldType::Bool, None),
-                APIStructField::new(
-                    "field5".to_string(),
-                    FieldType::Custom("MyEnum".to_string()),
+                create_field("field_string", FieldType::String, None, false, false, None, None),
+                create_field("field_number", FieldType::Number, None, false, false, None, None),
+                create_field("field_decimal", FieldType::Decimal, None, false, false, None, None),
+                create_field("field_bool", FieldType::Bool, None, false, false, None, None),
+                create_field(
+                    "field_custom",
+                    FieldType::Enum("MyEnum".to_string()),
+                    None,
+                    false,
+                    false,
+                    None,
                     None,
                 ),
             ],
         );
 
-        goldie::assert!(api_struct.to_string());
+        goldie::assert!(&api_struct.to_string());
     }
 
     #[test]
-    fn test_struct_with_defaults_to_string() {
+    fn test_struct_with_validation() {
         let api_struct = APIStruct::new(
-            "MyStructWithDefaults".to_string(),
+            "MyStructWithValidation".to_string(),
             vec![
-                APIStructField::new(
-                    "field1".to_string(),
+                create_field(
+                    "string_with_len",
                     FieldType::String,
-                    Some("default_string".to_string()),
+                    None,
+                    false,
+                    false,
+                    Some(1),
+                    Some(10),
                 ),
-                APIStructField::new(
-                    "field2".to_string(),
+                create_field(
+                    "number_with_range",
                     FieldType::Number,
-                    Some("42".to_string()),
+                    None,
+                    false,
+                    false,
+                    Some(0),
+                    Some(100),
                 ),
-                APIStructField::new(
-                    "field3".to_string(),
+                create_field(
+                    "decimal_with_range",
                     FieldType::Decimal,
-                    Some("123.45".to_string()),
+                    None,
+                    false,
+                    false,
+                    Some(0),
+                    Some(100),
                 ),
-                APIStructField::new(
-                    "field4".to_string(),
-                    FieldType::Bool,
-                    Some("true".to_string()),
+                create_field(
+                    "array_with_size",
+                    FieldType::String,
+                    None,
+                    true,
+                    false,
+                    Some(1),
+                    Some(5),
                 ),
-                APIStructField::new(
-                    "field5".to_string(),
-                    FieldType::Custom("MyEnum".to_string()),
-                    Some("MyEnum::VariantA".to_string()),
+                create_field(
+                    "map_with_size",
+                    FieldType::Number,
+                    None,
+                    false,
+                    true,
+                    Some(1),
+                    Some(10),
                 ),
-                APIStructField::new("field6".to_string(), FieldType::String, None),
             ],
         );
 
-        goldie::assert!(api_struct.to_string());
+        goldie::assert!(&api_struct.to_string());
+    }
+
+    #[test]
+    fn test_struct_with_collections() {
+        let api_struct = APIStruct::new(
+            "MyStructWithCollections".to_string(),
+            vec![
+                create_field("string_array", FieldType::String, None, true, false, None, None),
+                create_field(
+                    "custom_map",
+                    FieldType::Struct("AnotherType".to_string()),
+                    None,
+                    false,
+                    true,
+                    None,
+                    None,
+                ),
+            ],
+        );
+
+        goldie::assert!(&api_struct.to_string());
+    }
+
+    #[test]
+    fn test_struct_with_full_defaults() {
+        let api_struct = APIStruct::new(
+            "MyStructWithDefaults".to_string(),
+            vec![
+                create_field(
+                    "field1",
+                    FieldType::String,
+                    Some("default_string"),
+                    false,
+                    false,
+                    None,
+                    None,
+                ),
+                create_field("field2", FieldType::Number, Some("42"), false, false, None, None),
+                create_field("field3", FieldType::Decimal, Some("123.45"), false, false, None, None),
+                create_field("field4", FieldType::Bool, Some("true"), false, false, None, None),
+                create_field(
+                    "field5",
+                    FieldType::Enum("MyEnum".to_string()),
+                    Some("MyEnum::VariantA"),
+                    false,
+                    false,
+                    None,
+                    None,
+                ),
+            ],
+        );
+
+        goldie::assert!(&api_struct.to_string());
+    }
+
+    #[test]
+    fn test_struct_with_partial_defaults() {
+        let api_struct = APIStruct::new(
+            "MyStructWithPartialDefaults".to_string(),
+            vec![
+                create_field(
+                    "field1",
+                    FieldType::String,
+                    Some("default_string"),
+                    false,
+                    false,
+                    None,
+                    None,
+                ),
+                create_field("field2", FieldType::Number, None, false, false, None, None),
+            ],
+        );
+
+        goldie::assert!(&api_struct.to_string());
+    }
+
+    #[test]
+    fn test_struct_with_enum_validation() {
+        let api_struct = APIStruct::new(
+            "MyStructWithEnumValidation".to_string(),
+            vec![create_field(
+                "enum_field",
+                FieldType::Enum("MyTestEnum".to_string()),
+                None,
+                false,
+                false,
+                None,
+                None,
+            )],
+        );
+
+        goldie::assert!(&api_struct.to_string());
+    }
+
+    #[test]
+    fn test_struct_with_numeric_enum_validation() {
+        let api_struct = APIStruct::new(
+            "MyStructWithNumericEnumValidation".to_string(),
+            vec![create_field(
+                "enum_field",
+                FieldType::Enum("MyNumericEnum".to_string()),
+                None,
+                false,
+                false,
+                None,
+                None,
+            )],
+        );
+
+        goldie::assert!(&api_struct.to_string());
     }
 }

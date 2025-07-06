@@ -71,7 +71,9 @@ impl HttpClient {
         let mut builder = Request::builder().method(method).uri(&uri);
 
         // Set appropriate headers
-        if let Some(ref bytes) = body && !bytes.is_empty() {
+        if let Some(ref bytes) = body
+            && !bytes.is_empty()
+        {
             builder = builder.header("Content-Length", bytes.len());
             builder = builder.header("Content-Type", "application/octet-stream");
         }
@@ -148,12 +150,12 @@ impl Default for HttpClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hyper::StatusCode;
+    use http_body_util::BodyExt;
+
     #[tokio::test]
     #[cfg(not(feature = "disable-online-tests"))]
     async fn test_get_request() {
-        use http_body_util::BodyExt;
-        use hyper::StatusCode;
-
         let client = HttpClient::new();
 
         let response = client

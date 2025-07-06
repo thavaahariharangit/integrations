@@ -1,0 +1,8 @@
+#[derive(Debug, PartialEq)]
+pub struct MyStruct {
+    pub field_string: String,
+    pub field_number: i64,
+    pub field_decimal: bigdecimal::BigDecimal,
+    pub field_bool: bool,
+    pub field_custom: MyEnum,
+}

@@ -1,0 +1,5 @@
+#[derive(Debug, PartialEq)]
+pub struct MyStructWithCollections {
+    pub string_array: Vec<String>,
+    pub custom_map: std::collections::HashMap<String, AnotherType>,
+}

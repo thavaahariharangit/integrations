@@ -1,0 +1,19 @@
+#[derive(Debug, PartialEq)]
+pub struct MyStructWithDefaults {
+    pub field1: String,
+    pub field2: i64,
+    pub field3: bigdecimal::BigDecimal,
+    pub field4: bool,
+    pub field5: MyEnum,
+}
+impl Default for MyStructWithDefaults {
+    fn default() -> Self {
+        Self {
+            field1: "default_string".to_string(),
+            field2: 42,
+            field3: ::std::str::FromStr::from_str("123.45").unwrap(),
+            field4: true,
+            field5: MyEnum::VariantA,
+        }
+    }
+}

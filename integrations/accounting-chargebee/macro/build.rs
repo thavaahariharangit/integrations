@@ -9,10 +9,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use futures::*;
-use std::fs;
-use std::fs::create_dir_all;
-use std::path::Path;
+#[path = "src/bin/codegen/mod.rs"]
+mod codegen;
 
 fn main() {}
 

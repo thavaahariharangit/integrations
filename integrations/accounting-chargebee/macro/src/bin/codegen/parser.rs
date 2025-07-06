@@ -10,13 +10,17 @@
  */
 
 use anyhow::*;
+use scraper::*;
 
-// use bitsnap_integration::codegen::*;
+use bitsnap_integrations_shared::codegen::*;
+use bitsnap_integrations_shared::http::*;
+
+use hyper_util::rt::TokioExecutor;
 
 const SCRAPE_PAGE_HEADER_SELECTOR: &'static str = "div.page-header h2";
 const SCRAPE_ROOT_FIELDS_GROUP_SELECTOR: &'static str = "div.cb-list-group";
 
-pub(crate) fn parse(urls: Vec<String>) -> Result<(Vec<APIE>)> {
+pub(crate) async fn parse(url: String, executor: TokioExecutor) -> Result<API> {
     // let mut models = Vec::new();
     // let mut enums = Vec::new();
 

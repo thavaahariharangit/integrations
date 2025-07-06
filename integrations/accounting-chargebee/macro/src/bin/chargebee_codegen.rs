@@ -12,4 +12,7 @@
 mod codegen;
 pub use codegen::*;
 
-fn main() {}
+#[tokio::main]
+async fn main() {
+
+}

@@ -33,6 +33,9 @@ hyper-util = { workspace = true, features = ["http2", "client", "client-legacy"]
 hyper-rustls = { workspace = true, features = ["http1", "http2"] }
 rustls.workspace = true
 
+# Logging
+log.workspace = true
+
 # Errors
 thiserror.workspace = true
 anyhow.workspace = true
