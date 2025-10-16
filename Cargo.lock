@@ -1281,15 +1281,6 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
@@ -1703,9 +1694,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.11.1"
+version = "1.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b544ef1b4eac5dc2db33ea63606ae9ffcfac26c1416a2806ae0bf5f56b201191"
+checksum = "843bc0191f75f3e22651ae5f1e72939ab2f72a4bc30fa80a066bd66edefc24d4"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -1715,9 +1706,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.9"
+version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "809e8dc61f6de73b46c85f4c96486310fe304c434cfa43669d7b40f711150908"
+checksum = "5276caf25ac86c8d810222b3dbb938e512c55c6831a10f3e6ed1c93b84041f1c"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -1948,12 +1939,12 @@ dependencies = [
 
 [[package]]
 name = "serde_valid"
-version = "1.0.5"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b615bed66931a7a9809b273937adc8a402d038b1e509d027fcaf62f084d33d1"
+checksum = "de7f50148816c0fbeab7089476c91dbfae94bd891cc4e2c535f30b54ceb90ad2"
 dependencies = [
  "indexmap",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "num-traits",
  "once_cell",
  "paste",
@@ -1968,11 +1959,11 @@ dependencies = [
 
 [[package]]
 name = "serde_valid_derive"
-version = "1.0.5"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fa1a5a21ea5aab06d2e6a6b59837d450fb2be9695be97735a711edfbe79ea07"
+checksum = "c030af8a53ec37caf1ed98e5ce02cf7d4f65e637e8eaa089ed785689e86c9046"
 dependencies = [
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "paste",
  "proc-macro-error2",
  "proc-macro2",
@@ -1983,9 +1974,9 @@ dependencies = [
 
 [[package]]
 name = "serde_valid_literal"
-version = "1.0.5"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd07331596ea967dccf9a35bde71ecd757490e09827b938a5c6226c648e3a25e"
+checksum = "50b2fb68eefc69006cebe74b0f672ae68464c72b150dacd00d0877227c1300f7"
 dependencies = [
  "paste",
  "regex",
